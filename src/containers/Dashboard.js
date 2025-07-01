@@ -7,7 +7,10 @@ import Logout from "./Logout.js"
 
 export const filteredBills = (data, status) => {
   return (data && data.length) ?
-    data.filter(bill => {
+    // filter bills by date
+    data.sort((a, b) => new Date(b.date) - new Date(a.date))
+    // filter bills by status
+    .filter(bill => {
       let selectCondition
 
       // in jest environment
