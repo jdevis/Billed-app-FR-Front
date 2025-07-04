@@ -49,8 +49,6 @@ export default class {
 					snapshot.sort((a, b) => {
 						return new Date(b.date) - new Date(a.date);	
 					});
-					console.log('data tri par date: ',snapshot);
-					// snapshot is an array of bills, we format the date and status
 					const bills = snapshot.map((doc) => {
 						try {
 							return {
@@ -59,17 +57,14 @@ export default class {
 								status: formatStatus(doc.status),
 							};
 						} catch (e) {
-							// if for some reason, corrupted data was introduced, we manage here failing formatDate function
-							// log the error and return unformatted date in that case
-							console.log(e, 'for', doc);
+							console.error(e, 'for', doc);
 							return {
 								...doc,
-								date: formatDate(doc.date),
+								date: doc.date,
 								status: formatStatus(doc.status),
 							};
 						}
 					})
-					console.log('bills: ', bills);
 					return bills;
 				});
 		}
