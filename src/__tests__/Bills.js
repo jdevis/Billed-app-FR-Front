@@ -9,7 +9,6 @@ import mockStore from '../__mocks__/store.js';
 import { bills } from '../fixtures/bills.js';
 import { ROUTES_PATH } from '../constants/routes.js';
 import { localStorageMock } from '../__mocks__/localStorage.js';
-
 import router from '../app/Router.js';
 
 describe('Given I am connected as an employee', () => {
@@ -118,6 +117,34 @@ describe('Given I am connected as an employee', () => {
 			});
 			await billsContainer.getBills();
 			expect(getSpy).toHaveBeenCalledTimes(1);
+		});
+		test('Then it should handle 404 error', async () => {
+			const errorStore = {
+				bills: () => ({
+					list: () => Promise.reject(new Error('Erreur 404')),
+				})
+			};
+			const billsContainer = new Bills({
+				document,
+				onNavigate: jest.fn(),
+				store: errorStore,
+				localStorage: window.localStorage,
+			});
+			await expect(billsContainer.getBills()).rejects.toThrow('Erreur 404');
+		});
+		test('Then it should handle 500 error', async () => {
+			const errorStore = {
+				bills: () => ({
+					list: () => Promise.reject(new Error('Erreur 500')),
+				})
+			};
+			const billsContainer = new Bills({
+				document,
+				onNavigate: jest.fn(),
+				store: errorStore,
+				localStorage: window.localStorage,
+			});
+			await expect(billsContainer.getBills()).rejects.toThrow('Erreur 500');
 		});
 	});
 });

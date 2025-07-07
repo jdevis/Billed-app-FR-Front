@@ -113,13 +113,41 @@ describe('Given I am connected as an Employee', () => {
 		});
 	});
 
-	describe('When an error occurs on bill creation', () => {
+	describe('When an error 500 occurs on bill creation', () => {
 		test('Then it should log the error', async () => {
 			document.body.innerHTML = NewBillUI();
 			const onNavigate = jest.fn();
 			const errorStore = {
 				bills: () => ({
-					create: () => Promise.reject(new Error('API Error')),
+					create: () =>
+						Promise.reject({ message: 'Erreur 500', status: 500 }),
+				}),
+			};
+			const newBill = new NewBill({
+				document,
+				onNavigate,
+				store: errorStore,
+				localStorage: window.localStorage,
+			});
+			const fileInput = screen.getByTestId('file');
+			const file = new File(['test'], 'test.png', { type: 'image/png' });
+			const logSpy = jest
+				.spyOn(console, 'error')
+				.mockImplementation(() => {});
+			fireEvent.change(fileInput, { target: { files: [file] } });
+			await waitFor(() => expect(logSpy).toHaveBeenCalled());
+			logSpy.mockRestore();
+		});
+	});
+
+	describe('When an error 404 occurs on bill creation', () => {
+		test('Then it should log the error', async () => {
+			document.body.innerHTML = NewBillUI();
+			const onNavigate = jest.fn();
+			const errorStore = {
+				bills: () => ({
+					create: () =>
+						Promise.reject({ message: 'Erreur 404', status: 404 }),
 				}),
 			};
 			const newBill = new NewBill({
